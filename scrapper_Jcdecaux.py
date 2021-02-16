@@ -1,15 +1,22 @@
-name = "Dublin"
+#myPrivates should be a python file containing you key for jcdecaux
+from myPrivates import myKey
+
+name = "dublin"
 stations = "https://api.jcdecaux.com/vls/v1/stations"
-apikey = "940341f15a8989421a09f44a2e4527427f4c95dd"
+apikey = myKey
 
 
 #run all the time
 #some changes need to be made for sql connection
-while True:
-	try:
-		r = requests.get(stations,params={"apikey"=apikey, "contract"=name})
-		store(json.loads(r.text))
 
-		#sleep for 5 minutes
-	except:
-		print(traceback.format_exc())
+def main():
+	while True:
+		try:
+			r = requests.get(stations,params={"apiKey":apikey, "contract":name})
+			store(json.loads(r.text))
+
+			#sleep for 5 minutes
+		except:
+			print(traceback.format_exc())
+
+	return
