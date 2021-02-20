@@ -19,14 +19,12 @@ def main():
 		except:
 			print(traceback.format_exc())
 
-	return
 
-@store
-def w2panda_db():
-	#write json request to panda db
-	pass
 
-@store
-def send2aws():
-	#send data to aws database
-	pass
+	def w2panda_db():
+		#write json request to panda db
+		pass
+
+	def send2aws():
+		#send data to aws database
+		pass
