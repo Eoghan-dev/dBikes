@@ -10,6 +10,7 @@ import requests
 import json
 import traceback
 import datetime
+import time
 import salalchemy.dialects
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine, DateTime
@@ -37,20 +38,31 @@ engine = create_engine(f"mysql+mysqlconnector://{user}:{dbPass}@{db_url}:{sqlpor
 #run all the time
 while True:
 	try:
+		#request api from site
 		r = requests.get(stations,params={"apiKey":apikey, "contract":name})
+		#map json to list of dictionaries
 		values = list(map(get_station,r.json()))
+		#send values to database on mysql
 		send2mysql(engine,values)
 
-		#sleep for 5 minutes
+		time.sleep(300)
 	except:
 		print(traceback.format_exc())
 
 
 
 def get_station(obj):
-	#make list of dicts from json
-	pass
+	#design list of dictionaries
+	return {'number':obj['number'], 'name':obj['name'],
+	'address':obj['address'], 'pos_lat':obj['position']['lat'],
+	'pos_long':obj['position']['lng'],'bike_stands':obj['bike_stands'],
+	'available_bike_stands':obj['available_bike_stands'],'available_bikes':obj['available_bikes'],
+	'last_update': datetime.datetime.fromtimestamp(int(obj['last_update']/1e3))
+	}
 
-def send2mysql():
+
+def send2mysql(sqlEngine,values):
 	#send to rds database
-	pass
+	ins = availability.insert().values(values)
+	engine.execute(ins)
+
