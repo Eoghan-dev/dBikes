@@ -37,7 +37,21 @@ is sent to the rds database
 engine = create_engine(f"mysql+mysqlconnector://{user}:{dbPass}@{db_url}:{sqlport}/{dbName}")
 
 #define the structure of the table
-availability = tableStructure()
+meta = MetaData()
+availability = Table('availability',meta,
+	Column('number',Integer, primary_key = True),
+	Column('bike_stands',Integer),
+	Column('available_bike_stands',Integer),
+	Column('available_bikes',Integer),
+	Column('last_update', DateTime))
+
+#define data layout for mapping
+def get_station(obj):
+	#design dictionary to hold desiered data
+	return {'number':obj['number'], 'bike_stands':obj['bike_stands'],
+	'available_bike_stands':obj['available_bike_stands'],'available_bikes':obj['available_bikes'],
+	'last_update': datetime.datetime.fromtimestamp(int(obj['last_update']/1e3))
+	}
 
 #run all the time
 while True:
@@ -53,25 +67,3 @@ while True:
 		time.sleep(300)
 	except:
 		print(traceback.format_exc())
-
-
-
-def get_station(obj):
-	#design dictionary to hold desiered data
-	return {'number':obj['number'], 'name':obj['name'],
-	'address':obj['address'], 'pos_lat':obj['position']['lat'],
-	'pos_long':obj['position']['lng'],'bike_stands':obj['bike_stands'],
-	'available_bike_stands':obj['available_bike_stands'],'available_bikes':obj['available_bikes'],
-	'last_update': datetime.datetime.fromtimestamp(int(obj['last_update']/1e3))
-	}
-
-def tableStructure():
-	meta = MetaData()
-	availability = Table('availability',meta,
-		Column('number',Integer, primary_key = True),
-		Column('bike_stands',Integer),
-		Column('available_bike_stands',Integer),
-		Column('available_bikes',Integer),
-		Column('last_update', DateTime))
-	return availability
-
