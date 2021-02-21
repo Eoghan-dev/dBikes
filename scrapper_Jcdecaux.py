@@ -39,16 +39,15 @@ engine = create_engine(f"mysql+mysqlconnector://{user}:{dbPass}@{db_url}:{sqlpor
 #define the structure of the table
 meta = MetaData()
 availability = Table('availability',meta,
-	Column('number',Integer, primary_key = True),
+	Column('number',Integer),
 	Column('bike_stands',Integer),
 	Column('available_bike_stands',Integer),
 	Column('available_bikes',Integer),
 	Column('last_update', DateTime))
-
-#define data layout for mapping
+		
 def get_station(obj):
 	#design dictionary to hold desiered data
-	return {'number':obj['number'], 'bike_stands':obj['bike_stands'],
+	return {'number':obj['number'],'bike_stands':obj['bike_stands'],
 	'available_bike_stands':obj['available_bike_stands'],'available_bikes':obj['available_bikes'],
 	'last_update': datetime.datetime.fromtimestamp(int(obj['last_update']/1e3))
 	}
@@ -57,12 +56,12 @@ def get_station(obj):
 while True:
 	try:
 		#request api from site
-		r = requests.get(stations,params={"apiKey":apikey, "contract":name})
+		r = requests.get(stations_API,params={"apiKey":apikey, "contract":name})
 		#map json to list of dictionaries
 		values = list(map(get_station,r.json()))
 		#send values to database on mysql
 		ins = availability.insert().values(values)
-        	engine.execute(ins)
+		engine.execute(ins)
 
 		time.sleep(300)
 	except:
