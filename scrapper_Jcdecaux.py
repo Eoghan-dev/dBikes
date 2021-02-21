@@ -11,9 +11,10 @@ import json
 import traceback
 import datetime
 import time
-import salalchemy.dialects
+import sqlalchemy.dialects
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine, DateTime
+from sqlalchemy import Table, Column, Integer, MetaData
 
 '''
 Below variables used in f strings are declared. These
@@ -35,6 +36,9 @@ is sent to the rds database
 '''
 engine = create_engine(f"mysql+mysqlconnector://{user}:{dbPass}@{db_url}:{sqlport}/{dbName}")
 
+#define the structure of the table
+availability = tableStructure()
+
 #run all the time
 while True:
 	try:
@@ -43,7 +47,8 @@ while True:
 		#map json to list of dictionaries
 		values = list(map(get_station,r.json()))
 		#send values to database on mysql
-		send2mysql(engine,values)
+		ins = availability.insert().values(values)
+        	engine.execute(ins)
 
 		time.sleep(300)
 	except:
@@ -52,7 +57,7 @@ while True:
 
 
 def get_station(obj):
-	#design list of dictionaries
+	#design dictionary to hold desiered data
 	return {'number':obj['number'], 'name':obj['name'],
 	'address':obj['address'], 'pos_lat':obj['position']['lat'],
 	'pos_long':obj['position']['lng'],'bike_stands':obj['bike_stands'],
@@ -60,9 +65,13 @@ def get_station(obj):
 	'last_update': datetime.datetime.fromtimestamp(int(obj['last_update']/1e3))
 	}
 
-
-def send2mysql(sqlEngine,values):
-	#send to rds database
-	ins = availability.insert().values(values)
-	engine.execute(ins)
+def tableStructure():
+	meta = MetaData()
+	availability = Table('availability',meta,
+		Column('number',Integer, primary_key = True),
+		Column('bike_stands',Integer),
+		Column('available_bike_stands',Integer),
+		Column('available_bikes',Integer),
+		Column('last_update', DateTime))
+	return availability
 
