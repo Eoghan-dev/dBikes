@@ -37,24 +37,13 @@ is sent to the rds database
 engine = create_engine(f"mysql+mysqlconnector://{user}:{dbPass}@{db_url}:{sqlport}/{dbName}")
 
 #define the structure of the table
-availability = tableStructure()
-
-#run all the time
-while True:
-	try:
-		#request api from site
-		r = requests.get(stations,params={"apiKey":apikey, "contract":name})
-		#map json to list of dictionaries
-		values = list(map(get_station,r.json()))
-		#send values to database on mysql
-		ins = availability.insert().values(values)
-        	engine.execute(ins)
-
-		time.sleep(300)
-	except:
-		print(traceback.format_exc())
-
-
+meta = MetaData()
+availability = Table('availability',meta,
+		Column('number',Integer,primary_key=True),
+		Column('bike_stands',Integer),
+		Column('available_bike_stands',Integer),
+		Column('available_bikes',Integer),
+		Column('last_update',DateTime))
 
 def get_station(obj):
 	#design dictionary to hold desiered data
@@ -65,13 +54,17 @@ def get_station(obj):
 	'last_update': datetime.datetime.fromtimestamp(int(obj['last_update']/1e3))
 	}
 
-def tableStructure():
-	meta = MetaData()
-	availability = Table('availability',meta,
-		Column('number',Integer, primary_key = True),
-		Column('bike_stands',Integer),
-		Column('available_bike_stands',Integer),
-		Column('available_bikes',Integer),
-		Column('last_update', DateTime))
-	return availability
+#run all the time
+while True:
+	try:
+		#request api from site
+		r = requests.get(stations_API,params={"apiKey":apikey, "contract":name})
+		#map json to list of dictionaries
+		values = list(map(get_station,r.json()))
+		#send values to database on mysql
+		ins = availability.insert().values(values)
+		engine.execute(ins)
 
+		time.sleep(300)
+	except:
+		print(traceback.format_exc())
