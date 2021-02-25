@@ -3,8 +3,9 @@ import time
 import traceback
 from sqlalchemy import create_engine
 import requests
-import config
+from jcdx import config
 import sqlalchemy as sqla
+from datetime import datetime
 
 metadata = sqla.MetaData()
 
@@ -27,9 +28,8 @@ availability = sqla.Table('availability', metadata,
                           sqla.Column('available_bikes', sqla.Integer),
                           sqla.Column('available_bike_stands', sqla.Integer),
                           sqla.Column('number', sqla.Integer),
-                          sqla.Column('last_update', sqla.BigInteger) # to do: datetime
+                          sqla.Column('last_update', sqla.DateTime)
                           )
-
 
 # connect to database
 engine = create_engine(
@@ -37,19 +37,38 @@ engine = create_engine(
                                                    config.DB_NAME))
 
 
-def stations_fix_keys(station):
-    """move lat and lng in station"""
-    station['position_lat'] = station['position']['lat']
-    station['position_lng'] = station['position']['lng']
-    return station
+def get_station(data):
+    """ extract station static data"""
+    return {
+        "number": data['number'],
+        "contract_name": data['contract_name'],
+        "name": data['name'],
+        "address": data['address'],
+        "position_lat": data['position']['lat'],
+        "position_lng": data['position']['lng'],
+        "banking": data['banking'],
+        "bonus": data['bonus'],
+        "bike_stands": data['bike_stands'],
+        "status": data['status']
+    }
+
+
+def get_availability(data):
+    """ extract station dynamic data"""
+    return {
+        "number": data['number'],
+        "available_bike_stands": data['available_bike_stands'],
+        "available_bikes": data['available_bikes'],
+        "last_update": datetime.fromtimestamp(int(data['last_update']/1e3))
+    }
 
 
 def store(stations):
     """save station data to database"""
     # add all stations or new stations (ignore duplicate errors)
-    engine.execute(station.insert(prefixes=['IGNORE']), *map(stations_fix_keys, stations))
+    engine.execute(station.insert(prefixes=['IGNORE']), *map(get_station, stations))
     # add bike availability data
-    engine.execute(availability.insert(), *map(stations_fix_keys, stations))
+    engine.execute(availability.insert(), *map(get_availability, stations))
 
 
 # creates the database tables only if missing
@@ -68,5 +87,3 @@ while True:
 
     except:
         print(traceback.format_exc())
-
-
