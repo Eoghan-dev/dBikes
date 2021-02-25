@@ -3,7 +3,7 @@ import time
 import traceback
 from sqlalchemy import create_engine
 import requests
-from jcdx import config
+import config
 import sqlalchemy as sqla
 from datetime import datetime
 
