@@ -29,8 +29,3 @@ function initMap(){
 		console.log("OOPS!", err);
 	})	
 }
-
-
-//add API key
-src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyB_u-4V16D5GwDoKWDwnBYm-aSP68S_ygI&callback=initMap&libraries=&v=weekly"
-async
