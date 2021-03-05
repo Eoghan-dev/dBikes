@@ -1,4 +1,4 @@
-OPENWEATHER_URL = "http://api.openweathermap.org/data/2.5/weather"
+OPENWEATHER_URL = "http://api.openweathermap.org/data/2.5/onecall"
 OPENWEATHER_KEY = "API key here"
 
 DB_URL = "localhost"
