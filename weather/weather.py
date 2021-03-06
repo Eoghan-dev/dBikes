@@ -84,6 +84,84 @@ hourly = Table('hourly_weather', metadata,
                Column("pop", Float))
 
 
+def get_current_weather(data):
+    """ extract current weather"""
+    return {
+        "dt": datetime.fromtimestamp(int(data['dt'])),
+        "sunrise": datetime.fromtimestamp(int(data['sunrise'])),
+        "sunset": datetime.fromtimestamp(int(data['sunset'])),
+        "temp": data["temp"],
+        "feels_like": data["feels_like"],
+        "pressure": data["pressure"],
+        "humidity": data["humidity"],
+        "dew_point": data["dew_point"],
+        "uvi": data["uvi"],
+        "clouds": data["clouds"],
+        "visibility": data["visibility"],
+        "wind_speed": data["wind_speed"],
+        "wind_deg": data["wind_deg"],
+        "weather_id": data["weather"][0]["id"],
+        "weather_main": data["weather"][0]["main"],
+        "weather_description": data["weather"][0]["description"],
+        "weather_icon": data["weather"][0]["icon"]
+    }
+
+
+def get_daily_weather(current_dt, data):
+    """ extract daily weather"""
+    return {
+        "dt": datetime.fromtimestamp(int(current_dt)),
+        "future_dt": datetime.fromtimestamp(int(data['dt'])),
+        "sunrise": datetime.fromtimestamp(int(data['sunrise'])),
+        "sunset": datetime.fromtimestamp(int(data['sunset'])),
+        "temp_day": data["temp"]["day"],
+        "temp_min": data["temp"]["min"],
+        "temp_max": data["temp"]["max"],
+        "temp_night": data["temp"]["night"],
+        "temp_eve": data["temp"]["eve"],
+        "temp_morn": data["temp"]["morn"],
+        "feels_like_day": data["feels_like"]["day"],
+        "feels_like_night": data["feels_like"]["night"],
+        "feels_like_eve": data["feels_like"]["eve"],
+        "feels_like_morn": data["feels_like"]["morn"],
+        "pressure": data["pressure"],
+        "humidity": data["humidity"],
+        "dew_point": data["dew_point"],
+        "wind_speed": data["wind_speed"],
+        "wind_deg": data["wind_deg"],
+        "weather_id": data["weather"][0]["id"],
+        "weather_main": data["weather"][0]["main"],
+        "weather_description": data["weather"][0]["description"],
+        "weather_icon": data["weather"][0]["icon"],
+        "clouds": data["clouds"],
+        "pop": data["pop"],
+        "uvi": data["uvi"]
+    }
+
+
+def get_hourly_weather(current_dt, data):
+    """ extract hourly weather"""
+    return {
+        "dt": datetime.fromtimestamp(int(current_dt)),
+        "future_dt": datetime.fromtimestamp(int(data['dt'])),
+        "temp": data["temp"],
+        "feels_like": data["feels_like"],
+        "pressure": data["pressure"],
+        "humidity": data["humidity"],
+        "dew_point": data["dew_point"],
+        "uvi": data["uvi"],
+        "clouds": data["clouds"],
+        "visibility": data["visibility"],
+        "wind_speed": data["wind_speed"],
+        "wind_deg": data["wind_deg"],
+        "weather_id": data["weather"][0]["id"],
+        "weather_main": data["weather"][0]["main"],
+        "weather_description": data["weather"][0]["description"],
+        "weather_icon": data["weather"][0]["icon"],
+        "pop": data["pop"]
+    }
+
+
 def store(weather):
     # to do: save weather to database
     print(weather)
