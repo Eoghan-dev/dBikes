@@ -7,6 +7,8 @@ import config
 import sqlalchemy as sqla
 from datetime import datetime
 
+from sqlalchemy.exc import IntegrityError
+
 metadata = sqla.MetaData()
 
 # connect to database
@@ -162,9 +164,32 @@ def get_hourly_weather(current_dt, data):
     }
 
 
+def write_to_db(table_obj, data):
+    """write data to table"""
+    with engine.connect() as connection:
+        for entry in data:
+            try:
+                connection.execute(table_obj.insert().values(entry))
+            except IntegrityError as error:
+                print("Integrity error.", error)
+            except:
+                print(traceback.format_exc())
+
+
 def store(weather):
-    # to do: save weather to database
-    print(weather)
+    """store all weather data"""
+    # store current weather
+    current_weather = get_current_weather(weather["current"])
+    write_to_db(current, [current_weather])
+
+    current_dt = weather["current"]['dt']
+    # store daily weather
+    daily_weather = [get_daily_weather(current_dt, item) for item in weather["daily"]]
+    write_to_db(daily, daily_weather)
+
+    # store hourly weather
+    hourly_weather = [get_hourly_weather(current_dt, item) for item in weather["hourly"]]
+    write_to_db(hourly, hourly_weather)
 
 
 # creates the database tables only if missing
