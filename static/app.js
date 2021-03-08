@@ -17,11 +17,11 @@ function initMap(){
 				position: {lat: station.pos_lat, lng: station.pos_long},
 				map: map,
 			});
-			//const infowindow; could define here and close before creating
 			marker.addListener("click", () => {
-				//Close info window in this line to fix bug a?
-				const infowindow = new google.maps.InfoWindow({
+				//Close info window in this line to fix bug a
+				var infowindow = new google.maps.InfoWindow({
 					content: station.name,
+					position: {lat: marker.lat, lng: marker.lng}
 				});
 				infowindow.open(map, marker);
 			});
