@@ -8,7 +8,7 @@ function initMap(){
 
 		map = new google.maps.Map(document.getElementById("map"),{
 				center: {lat: 53.34632331338235, lng: -6.26150959615664},
-				zoom: 13,
+				zoom: 14,
 				//read documentation and find features
 		});
 
@@ -21,11 +21,14 @@ function initMap(){
 				//Close info window in this line to fix bug a
 				var infowindow = new google.maps.InfoWindow({
 					content: station.name,
-					position: {lat: marker.lat, lng: marker.lng}
 				});
 				infowindow.open(map, marker);
 			});
 		});
+
+		const bikeLayer = new google.maps.BicyclingLayer();
+  		bikeLayer.setMap(map);
+
 
 	}).catch(err => {
 		console.log("OOPS!", err);
