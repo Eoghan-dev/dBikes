@@ -13,7 +13,7 @@ function initMap(){
 		});
 
 		data.forEach(station => {
-			marker = new google.maps.Marker({
+			const marker = new google.maps.Marker({
 				position: {lat: station.pos_lat, lng: station.pos_long},
 				map: map,
 			});
