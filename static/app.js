@@ -1,5 +1,9 @@
 let map;
 
+function init(){
+
+}
+
 function initMap(){
 	fetch("/stations").then(response => {
 		return response.json()
@@ -23,6 +27,8 @@ function initMap(){
 					content: station.name,
 				});
 				infowindow.open(map, marker);
+				console.log("calling drawOccupancyWeekly " + station.number);
+				drawOccupancyWeekly(station.number);
 			});
 		});
 
@@ -33,4 +39,28 @@ function initMap(){
 	}).catch(err => {
 		console.log("OOPS!", err);
 	})	
+}
+
+function drawOccupancyWeekly(station_number) {
+	// called when user clicks marker
+	// use google charts to draw chart
+
+	fetch( input: "/occupancy/" + station_number).then(response => {
+		return response.json;
+	}).then( data => {
+		console.log(data);
+
+		var options = {
+			title: "Bike Availability per day"
+		}
+
+		var chart = new google.visualisation.ColumnChart(document.getElementById( element: 'charts'));
+		var chart_data = new google.visualisation.Data_Table();
+		chart_data.addColumn( z: 'datetime', 'Date');
+		chart_data.addColumn( z: 'number', 'Bike Availability');
+
+		data.forEach(availability => {
+			
+		})
+	})
 }
