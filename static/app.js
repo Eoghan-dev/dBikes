@@ -46,17 +46,17 @@ function drawOccupancyWeekly(station_number) {
 	// called when user clicks marker
 	// use google charts to draw chart
 
-	fetch( input: "/occupancy/" + station_number).then(response => {
-		return response.json;
+	fetch( "/occupancy/" + station_number).then(response => {
+		return response.json()
 	}).then( data => {
-		console.log(data);
+		console.log("occupancy data:",data);
 
 		var options = {
 			title: "Bike Availability per day"
 		}
 
-		var chart = new google.visualisation.ColumnChart(document.getElementById( elementid: 'charts'));
-		var chart_data = new google.visualisation.Data_able();
+		var chart = new google.visualization.ColumnChart(document.getElementById('charts'));
+		var chart_data = new google.visualization.DataTable();
 		chart_data.addColumn('datetime', 'Date');
 		chart_data.addColumn('number', 'Bike Availability');
 
