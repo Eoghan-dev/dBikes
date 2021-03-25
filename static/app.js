@@ -1,6 +1,6 @@
 let map;
 
-function init(){
+function initCharts(){
 	google.charts.load('current',{'packages':['corechart']});
 	google.charts.setOnLoadCallback(initMap);
 }
