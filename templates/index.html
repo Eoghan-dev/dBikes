@@ -4,11 +4,13 @@
 	<meta charset="utf-8">
 	<title>Flask app</title>
 	<meta name="description" content="First index.html">
-	<meta name="Author" content="Cyclepaths">
+	<meta name="author" content="Cyclepaths">
 
 	<!-- <link rel="style" href="css/styles.css" -->	
 	<link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet" type="text/css" >
+
 	<script type="text/javascript" src="{{ url_for('static', filename='app.js') }}"></script>
+	<script type="text/javascript" src="hhtps://www.gstatic.com/charts/loader.js"></script>
 
 </head>
 
@@ -21,6 +23,6 @@
 	
 	<div id="charts"></div>
 	
-	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_u-4V16D5GwDoKWDwnBYm-aSP68S_ygI&callback=initMap&libraries=&v=weekly" async></script>
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_u-4V16D5GwDoKWDwnBYm-aSP68S_ygI&callback=init&libraries=&v=weekly" async></script>
 </body>
 </html>

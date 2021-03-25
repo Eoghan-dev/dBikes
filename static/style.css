@@ -1,11 +1,15 @@
 /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
 #map {
-  height: 90%;
+  height: 60%;
 }
 
 #header {
   height: 10%;
+}
+
+#charts {
+	height: 30%
 }
 
 /* Optional: Makes the sample page fill the window. */

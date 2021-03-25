@@ -1,7 +1,8 @@
 let map;
 
 function init(){
-
+	google.charts.load('current',{'packages':['corechart']});
+	google.charts.setOnLoadCallback(initMap);
 }
 
 function initMap(){
@@ -54,13 +55,14 @@ function drawOccupancyWeekly(station_number) {
 			title: "Bike Availability per day"
 		}
 
-		var chart = new google.visualisation.ColumnChart(document.getElementById( element: 'charts'));
-		var chart_data = new google.visualisation.Data_Table();
-		chart_data.addColumn( z: 'datetime', 'Date');
-		chart_data.addColumn( z: 'number', 'Bike Availability');
+		var chart = new google.visualisation.ColumnChart(document.getElementById( elementid: 'charts'));
+		var chart_data = new google.visualisation.Data_able();
+		chart_data.addColumn('datetime', 'Date');
+		chart_data.addColumn('number', 'Bike Availability');
 
-		data.forEach(availability => {
-			
+		data.forEach(v => {
+			chart_data.addRow([new Date(v.last_update, v.available_bikes)]);
 		})
+		chart.draw(chart_data, options);
 	})
 }

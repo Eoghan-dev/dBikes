@@ -2,6 +2,7 @@ from flask import Flask, render_template
 from sqlalchemy import create_engine
 import pandas as pd
 import myPrivates
+from functools import lru_cache
 
 app = Flask(__name__)
 
