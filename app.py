@@ -14,6 +14,10 @@ def hello():
 def about():
 	return app.send_static_file("")
 
+@app.route("/dropdown")
+def dropdown():
+    return app.send_static_file("dropdown.html")
+
 @app.route("/stations")
 def stations():
 	engine = create_engine(f"mysql+mysqlconnector://{myPrivates.user}:{myPrivates.dbPass}@{myPrivates.dbURL}:{myPrivates.port}/{myPrivates.dbName}")
