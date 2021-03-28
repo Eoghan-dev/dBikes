@@ -18,10 +18,34 @@ function initMap(){
 		});
 
 		data.forEach(station => {
+		    // get circle colour
+		    if (station.available_bikes/station.available_bike_stands < 0.25){
+		        colour = 'red';
+		    } else if (station.available_bikes/station.available_bike_stands > 0.75){
+		        colour = 'green';
+		    } else {
+		        colour = 'orange';
+		    }
+		    //circles for density
+		    const circle = new google.maps.Circle({
+                strokeColor: colour,
+                strokeOpacity: '0.9',
+                strokeWeight: 0,
+                fillColor: colour,
+                fillOpacity: 0.55,
+                map: map,
+                radius: 50,
+                clickable:false,
+                center: {lat: station.pos_lat, lng: station.pos_long},
+		    });
+
+		    //make markers
 			const marker = new google.maps.Marker({
 				position: {lat: station.pos_lat, lng: station.pos_long},
 				map: map,
 			});
+
+			//add listeners to markers
 			marker.addListener("click", () => {
 				//Close info window in this line to fix bug a
 				var infowindow = new google.maps.InfoWindow({
@@ -56,10 +80,10 @@ function drawOccupancyWeekly(station_number) {
 			title: "Bike Availability per day"
 		}
 
-		var chart = new google.visualization.ColumnChart(document.getElementById('charts'));
+		var chart = new google.visualization.LineChart(document.getElementById('charts'));
 		var chart_data = new google.visualization.DataTable();
 		chart_data.addColumn('datetime', "Date");
-		chart_data.addColumn('number', "Bike Availability");
+		chart_data.addColumn('number', "Avg Bike Availability");
 
 		data.forEach(v => {
 			chart_data.addRow([new Date(v.last_update), v.available_bikes]);
@@ -70,5 +94,9 @@ function drawOccupancyWeekly(station_number) {
 
 function stationDensity(station_number){
     // This function should colour the circles under markers to represent
-    // how many bikes are available (red - none, green loads)
+    // how many bikes are available (red - none, green - loads)
+
+    // currently density is done with stations table which was scraped once (way back when)
+    // think about implementing availability using this function
+    // or updating stations before submission and exclude this function
 }
