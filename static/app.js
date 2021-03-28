@@ -47,6 +47,7 @@ function drawOccupancyWeekly(station_number) {
 	// use google charts to draw chart
 
 	fetch( "/occupancy/" + station_number).then(response => {
+	    //console.log("get_occupancy response:",response);
 		return response.json()
 	}).then( data => {
 		console.log("occupancy data:",data);
@@ -57,12 +58,17 @@ function drawOccupancyWeekly(station_number) {
 
 		var chart = new google.visualization.ColumnChart(document.getElementById('charts'));
 		var chart_data = new google.visualization.DataTable();
-		chart_data.addColumn('datetime', 'Date');
-		chart_data.addColumn('number', 'Bike Availability');
+		chart_data.addColumn('datetime', "Date");
+		chart_data.addColumn('number', "Bike Availability");
 
 		data.forEach(v => {
-			chart_data.addRow([new Date(v.last_update, v.available_bikes)]);
+			chart_data.addRow([new Date(v.last_update), v.available_bikes]);
 		})
 		chart.draw(chart_data, options);
 	})
+}
+
+function stationDensity(station_number){
+    // This function should colour the circles under markers to represent
+    // how many bikes are available (red - none, green loads)
 }

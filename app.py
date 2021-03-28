@@ -21,7 +21,7 @@ def stations():
 	df = pd.read_sql_table("stations", engine)
 	return df.to_json(orient='records')
 
-@app.route("/occupancy/int:<station_id>")
+@app.route("/occupancy/<int:station_id>")
 @lru_cache
 def get_occupancy(station_id):
 	engine = create_engine(f"mysql+mysqlconnector://{myPrivates.user}:{myPrivates.dbPass}@{myPrivates.dbURL}:{myPrivates.port}/{myPrivates.dbName}")
@@ -32,6 +32,8 @@ def get_occupancy(station_id):
 	df = pd.read_sql_query(query, engine)
 	df_result = df.set_index('last_update').resample('1d').mean()
 	df_result['last_update'] = df_result.index
+
+	#df_result.to_json(orient='records') this returns string pair with json.loads()?
 
 	return df_result.to_json(orient='records')
 
