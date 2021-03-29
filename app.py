@@ -20,5 +20,17 @@ def stations():
 	df = pd.read_sql_table("stations", engine)
 	return df.to_json(orient='records')
 
+@app.route("/weather")
+def weather():
+	engine = create_engine(f"mysql+mysqlconnector://{myPrivates.user}:{myPrivates.dbPass}@{myPrivates.dbURL}:{myPrivates.port}/{myPrivates.dbName}")
+	# read current weather from database
+	df = pd.read_sql_table("current_weather", engine)
+	# sort by date descending
+	df = df.sort_values(by='dt', ascending=False)
+	# get first row
+	value = df.head(1)
+	# return weather as json
+	return value.to_json(orient="records")
+
 if __name__ == "__main__":
 	app.run(debug=True)
