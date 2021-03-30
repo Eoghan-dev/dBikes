@@ -21,9 +21,9 @@ def stations():
 	df = pd.read_sql_table("stations", engine)
 	return df.to_json(orient='records')
 
-@app.route("/occupancy/<int:station_id>")
+@app.route("/occupancyD/<int:station_id>")
 @lru_cache
-def get_occupancy(station_id):
+def get_occupancyDay(station_id):
 	engine = create_engine(f"mysql+mysqlconnector://{myPrivates.user}:{myPrivates.dbPass}@{myPrivates.dbURL}:{myPrivates.port}/{myPrivates.dbName}")
 	#experiment with query in jupyter notebook
 	query = f"""SELECT number, last_update, available_bikes, available_bike_stands FROM dbikes.availability 
@@ -31,6 +31,20 @@ def get_occupancy(station_id):
 
 	df = pd.read_sql_query(query, engine)
 	df_result = df.set_index('last_update').resample('1d').mean()
+	df_result['last_update'] = df_result.index
+
+	return df_result.to_json(orient='records')
+
+@app.route("/occupancyW/<int:station_id>")
+@lru_cache
+def get_occupancyWeek(station_id):
+	engine = create_engine(f"mysql+mysqlconnector://{myPrivates.user}:{myPrivates.dbPass}@{myPrivates.dbURL}:{myPrivates.port}/{myPrivates.dbName}")
+	#experiment with query in jupyter notebook
+	query = f"""SELECT number, last_update, available_bikes, available_bike_stands FROM dbikes.availability 
+	WHERE number = {station_id}"""
+
+	df = pd.read_sql_query(query, engine)
+	df_result = df.set_index('last_update').resample('1w').mean()
 	df_result['last_update'] = df_result.index
 
 	return df_result.to_json(orient='records')

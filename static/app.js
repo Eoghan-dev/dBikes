@@ -13,7 +13,7 @@ function initMap(){
 
 		map = new google.maps.Map(document.getElementById("map"),{
 				center: {lat: 53.34632331338235, lng: -6.26150959615664},
-				zoom: 14,
+				zoom: 15,
 				//read documentation and find features
 		});
 
@@ -54,6 +54,7 @@ function initMap(){
 				infowindow.open(map, marker);
 				console.log("calling drawOccupancyWeekly " + station.number);
 				drawOccupancyDaily(station.number);
+				drawOccupancyWeekly(station.number);
 			});
 		});
 
@@ -63,24 +64,50 @@ function initMap(){
 
 	}).catch(err => {
 		console.log("OOPS!", err);
-	})	
+	})
 }
 
 function drawOccupancyDaily(station_number) {
 	// called when user clicks marker
 	// use google charts to draw chart
 
-	fetch( "/occupancy/" + station_number).then(response => {
+	fetch( "/occupancyD/" + station_number).then(response => {
 	    //console.log("get_occupancy response:",response);
 		return response.json()
 	}).then( data => {
 		console.log("occupancy data:",data);
 
 		var options = {
-			title: "Bike Availability per day"
+            title: "Average Bike Availability per day"
 		}
 
 		var chart = new google.visualization.LineChart(document.getElementById('chartL'));
+		var chart_data = new google.visualization.DataTable();
+		chart_data.addColumn('datetime', "Date");
+		chart_data.addColumn('number', "Avg Bike Availability");
+
+		data.forEach(v => {
+			chart_data.addRow([new Date(v.last_update), v.available_bikes]);
+		})
+		chart.draw(chart_data, options);
+	})
+}
+
+function drawOccupancyWeekly(station_number) {
+	// called when user clicks marker
+	// use google charts to draw chart
+
+	fetch( "/occupancyW/" + station_number).then(response => {
+	    //console.log("get_occupancy response:",response);
+		return response.json()
+	}).then( data => {
+		console.log("occupancy data:",data);
+
+		var options = {
+			title: "Average Bike Availability per week"
+		}
+
+		var chart = new google.visualization.ColumnChart(document.getElementById('chartR'));
 		var chart_data = new google.visualization.DataTable();
 		chart_data.addColumn('datetime', "Date");
 		chart_data.addColumn('number', "Avg Bike Availability");
