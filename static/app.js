@@ -53,7 +53,7 @@ function initMap(){
 				});
 				infowindow.open(map, marker);
 				console.log("calling drawOccupancyWeekly " + station.number);
-				drawOccupancyWeekly(station.number);
+				drawOccupancyDaily(station.number);
 			});
 		});
 
@@ -66,7 +66,7 @@ function initMap(){
 	})	
 }
 
-function drawOccupancyWeekly(station_number) {
+function drawOccupancyDaily(station_number) {
 	// called when user clicks marker
 	// use google charts to draw chart
 
@@ -80,7 +80,7 @@ function drawOccupancyWeekly(station_number) {
 			title: "Bike Availability per day"
 		}
 
-		var chart = new google.visualization.LineChart(document.getElementById('charts'));
+		var chart = new google.visualization.LineChart(document.getElementById('chartL'));
 		var chart_data = new google.visualization.DataTable();
 		chart_data.addColumn('datetime', "Date");
 		chart_data.addColumn('number', "Avg Bike Availability");

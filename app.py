@@ -33,8 +33,6 @@ def get_occupancy(station_id):
 	df_result = df.set_index('last_update').resample('1d').mean()
 	df_result['last_update'] = df_result.index
 
-	#df_result.to_json(orient='records') this returns string pair with json.loads()?
-
 	return df_result.to_json(orient='records')
 
 if __name__ == "__main__":
