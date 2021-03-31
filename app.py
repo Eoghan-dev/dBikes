@@ -40,12 +40,13 @@ def get_occupancyDay(station_id):
 def get_occupancyWeek(station_id):
 	engine = create_engine(f"mysql+mysqlconnector://{myPrivates.user}:{myPrivates.dbPass}@{myPrivates.dbURL}:{myPrivates.port}/{myPrivates.dbName}")
 	#experiment with query in jupyter notebook
-	query = f"""SELECT number, last_update, available_bikes, available_bike_stands FROM dbikes.availability 
-	WHERE number = {station_id}"""
+	query = f"""SELECT number, dayname(last_update), avg(available_bikes), avg(available_bike_stands) FROM dbikes.availability 
+	WHERE number = {station_id} GROUP BY dayname(last_update)"""
 
 	df = pd.read_sql_query(query, engine)
-	df_result = df.set_index('last_update').resample('1w').mean()
-	df_result['last_update'] = df_result.index
+	df_result = df.set_index('dayname(last_update)')
+	df_result['last_update_day'] = df_result.index
+	df_result.rename(columns={"avg(available_bikes)": "available_bikes"}, inplace=True)
 
 	return df_result.to_json(orient='records')
 

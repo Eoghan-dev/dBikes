@@ -78,7 +78,13 @@ function drawOccupancyDaily(station_number) {
 		console.log("occupancy data:",data);
 
 		var options = {
-            title: "Average Bike Availability per day"
+            title: "Average Bike Availability per day",
+            hAxis: {
+                title: "Date"
+            },
+            vAxis: {
+                title: "Avg Number of Bikes"
+            }
 		}
 
 		var chart = new google.visualization.LineChart(document.getElementById('chartL'));
@@ -104,16 +110,19 @@ function drawOccupancyWeekly(station_number) {
 		console.log("occupancy data:",data);
 
 		var options = {
-			title: "Average Bike Availability per week"
+			title: "Average Bike Availability per week",
+            vAxis: {
+                title: "Avg Number of Bikes"
+            }
 		}
 
 		var chart = new google.visualization.ColumnChart(document.getElementById('chartR'));
 		var chart_data = new google.visualization.DataTable();
-		chart_data.addColumn('datetime', "Date");
+		chart_data.addColumn('string', "Day");
 		chart_data.addColumn('number', "Avg Bike Availability");
 
 		data.forEach(v => {
-			chart_data.addRow([new Date(v.last_update), v.available_bikes]);
+			chart_data.addRow([v.last_update_day, v.available_bikes]);
 		})
 		chart.draw(chart_data, options);
 	})
