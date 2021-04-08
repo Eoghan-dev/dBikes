@@ -20,7 +20,7 @@ function initMap(){
 			marker.addListener("click", () => {
 				//Close info window in this line to fix bug a
 				var infowindow = new google.maps.InfoWindow({
-					content: station.name,
+					content: station.name + get_weather(),
 				});
 				infowindow.open(map, marker);
 			});
@@ -33,4 +33,22 @@ function initMap(){
 	}).catch(err => {
 		console.log("OOPS!", err);
 	})	
+}
+
+var weather = {}
+fetch("/weather").then(response => {
+	return response.json()
+}).then(data => {
+	weather = data[0]
+})
+
+function get_weather() {
+	return "<div class='weather'><img src='/static/images/"+weather['weather_icon']+".png'>" +
+		"<p><strong>Current weather: " + weather['weather_description'] + "</strong></p>" +
+		"<p>Temperature " + parseInt(weather['temp'] - 273.15) + "&#8451;</p>" +
+		"<p>Feels like " + parseInt(weather['feels_like'] - 273.15) + "&#8451;</p>" +
+		"<p>Humidity " + weather['humidity'] + "%</p>" +
+		"<p>Clouds " + weather['clouds'] + "%</p>" +
+		"<p>Wind speed " + weather['wind_speed'] + " m/s</p>" +
+		"</div>"
 }
