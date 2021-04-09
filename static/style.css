@@ -24,3 +24,15 @@ body {
   margin: 0;
   padding: 0;
 }
+
+.weather p {
+    padding: 0;
+    margin: 0;
+    text-transform: capitalize;
+    display: block;
+    min-width: 220px;
+}
+
+.weather img {
+    float: right;
+}
