@@ -1,3 +1,6 @@
+import datetime
+import json
+
 from flask import Flask, render_template
 from sqlalchemy import create_engine
 import pandas as pd
@@ -27,7 +30,7 @@ def stations():
 def get_occupancyDay(station_id):
 	engine = create_engine(f"mysql+mysqlconnector://{myPrivates.user}:{myPrivates.dbPass}@{myPrivates.dbURL}:{myPrivates.port}/{myPrivates.dbName}")
 	#experiment with query in jupyter notebook
-	query = f"""SELECT number, last_update, available_bikes, available_bike_stands FROM dbikes.availability 
+	query = f"""SELECT number, last_update, available_bikes, available_bike_stands FROM availability 
 	WHERE number = {station_id}"""
 
 	df = pd.read_sql_query(query, engine)
@@ -41,7 +44,7 @@ def get_occupancyDay(station_id):
 def get_occupancyWeek(station_id):
 	engine = create_engine(f"mysql+mysqlconnector://{myPrivates.user}:{myPrivates.dbPass}@{myPrivates.dbURL}:{myPrivates.port}/{myPrivates.dbName}")
 	#experiment with query in jupyter notebook
-	query = f"""SELECT number, dayname(last_update), avg(available_bikes), avg(available_bike_stands) FROM dbikes.availability 
+	query = f"""SELECT number, dayname(last_update), avg(available_bikes), avg(available_bike_stands) FROM availability 
 	WHERE number = {station_id} GROUP BY dayname(last_update)"""
 
 	df = pd.read_sql_query(query, engine)
@@ -52,7 +55,7 @@ def get_occupancyWeek(station_id):
 	return df_result.to_json(orient='records')
 
 @app.route("/weather")
-def weather():
+def current_weather():
 	engine = create_engine(f"mysql+mysqlconnector://{myPrivates.user}:{myPrivates.dbPass}@{myPrivates.dbURL}:{myPrivates.port}/{myPrivates.dbName}")
 	# read current weather from database
 	df = pd.read_sql_table("current_weather", engine)
@@ -62,6 +65,29 @@ def weather():
 	value = df.head(1)
 	# return weather as json
 	return value.to_json(orient="records")
+
+@app.route("/weather/<int:req_day>/<int:req_time>")
+def weather_forecast(req_day, req_time):
+	engine = create_engine(f"mysql+mysqlconnector://{myPrivates.user}:{myPrivates.dbPass}@{myPrivates.dbURL}:{myPrivates.port}/{myPrivates.dbName}")
+	# get today as weekday
+	today = datetime.datetime.today().weekday()
+	# get current hour
+	hour = datetime.datetime.today().hour
+	# calculate the correct date for the requested weekday
+	date = datetime.datetime.today() + datetime.timedelta(req_day - today)
+	# check if the date is in the past
+	if today == req_day and req_time <= hour:
+		return {}
+	# transform the date to 'yyyy-mm-dd HH:MM'
+	future_dt = date.strftime('%Y-%m-%d') + ' ' + str(req_time) + ':00'
+	# get weather forecast from hourly weather table
+	sql = f"SELECT * FROM hourly_weather WHERE future_dt='{future_dt}' ORDER BY dt DESC LIMIT 1"
+	weather_df = pd.read_sql_query(sql, engine)
+	if weather_df.empty:
+		# if no forecast return empty
+		return {}
+	else:
+		return weather_df.to_json(orient="records")
 
 def predict(station_number, temp=281.11, humidity=60, wind_speed=0, weather_id=803, week_day=0, hour=12):
     """ Predict available bikes for station, weekday, hour, and weather. """
@@ -87,8 +113,6 @@ def predict(station_number, temp=281.11, humidity=60, wind_speed=0, weather_id=8
 
     # return the prediction
     return int(round(y[0]))
-
-
 
 if __name__ == "__main__":
 	app.run(debug=True)
