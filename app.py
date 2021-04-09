@@ -21,6 +21,18 @@ def stations():
 	df = pd.read_sql_table("stations", engine)
 	return df.to_json(orient='records')
 
+@app.route("/weather")
+def weather():
+	engine = create_engine(f"mysql+mysqlconnector://{myPrivates.user}:{myPrivates.dbPass}@{myPrivates.dbURL}:{myPrivates.port}/{myPrivates.dbName}")
+	# read current weather from database
+	df = pd.read_sql_table("current_weather", engine)
+	# sort by date descending
+	df = df.sort_values(by='dt', ascending=False)
+	# get first row
+	value = df.head(1)
+	# return weather as json
+	return value.to_json(orient="records")
+
 def predict(station_number, temp=281.11, humidity=60, wind_speed=0, weather_id=803, week_day=0, hour=12):
     """ Predict available bikes for station, weekday, hour, and weather. """
     # prepare features
@@ -45,6 +57,8 @@ def predict(station_number, temp=281.11, humidity=60, wind_speed=0, weather_id=8
 
     # return the prediction
     return int(round(y[0]))
+
+
 
 if __name__ == "__main__":
 	app.run(debug=True)
