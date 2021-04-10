@@ -1,4 +1,5 @@
 let map;
+var infowindow = null;
 
 function initCharts(){
 	google.charts.load('current',{'packages':['corechart']});
@@ -17,7 +18,11 @@ function initMap(){
 				//read documentation and find features
 		});
 
+        var stationStr = "";
+
 		data.forEach(station => {
+		    stationStr = stationStr + "<li><a>" + formatStationName(str=station.name) + "</a></li>"
+
 		    // get circle colour
 		    if (station.available_bikes/station.available_bike_stands < 0.25){
 		        colour = 'red';
@@ -48,15 +53,19 @@ function initMap(){
 			//add listeners to markers
 			marker.addListener("click", () => {
 				//Close info window in this line to fix bug a
-				var infowindow = new google.maps.InfoWindow({
+				if (infowindow) {
+				    infowindow.close();
+				}
+				infowindow = new google.maps.InfoWindow({
 					content: station.name + get_weather(),
 				});
 				infowindow.open(map, marker);
-				console.log("calling drawOccupancyWeekly " + station.number);
+				//console.log("calling drawOccupancyWeekly " + station.number);
 				drawOccupancyDaily(station.number);
 				drawOccupancyWeekly(station.number);
 			});
 		});
+        document.getElementById("stationList").innerHTML = stationStr;
 
 		const bikeLayer = new google.maps.BicyclingLayer();
   		bikeLayer.setMap(map);
@@ -79,6 +88,7 @@ function drawOccupancyDaily(station_number) {
 
 		var options = {
             title: "Average Bike Availability per day",
+            legend: "none",
             hAxis: {
                 title: "Date"
             },
@@ -111,6 +121,7 @@ function drawOccupancyWeekly(station_number) {
 
 		var options = {
 			title: "Average Bike Availability per week",
+			legend: "none",
             vAxis: {
                 title: "Avg Number of Bikes"
             }
@@ -128,7 +139,6 @@ function drawOccupancyWeekly(station_number) {
 	})
 }
 
-
 function stationDensity(station_number){
     // This function should colour the circles under markers to represent
     // how many bikes are available (red - none, green - loads)
@@ -136,6 +146,14 @@ function stationDensity(station_number){
     // currently density is done with stations table which was scraped once (way back when)
     // think about implementing availability using this function
     // or updating stations before submission and exclude this function
+}
+
+function formatStationName(str){
+    var words = str.split(" ");
+    words.map((word) => {
+        return word[0].toUpperCase + word.substring(1);
+    }).join(" ");
+    return words;
 }
 
 var weather = {}

@@ -16,9 +16,10 @@
 
 <body>
 	<div id="header">
-		    <h2>Bicycle Availability and Weather Information</h2>
 
-    <form action="/form/submit" method="post">
+        <h2>Bicycle Availability and Weather Information</h2>
+
+        <form action="/form/submit" method="post">
         <label>Please choose a day and time:</label>
         <select id="day">
           <option value="Monday">Monday</option>
@@ -61,9 +62,17 @@
     </form>
 	</div>
 
-	<div id="map"></div>
+    <div class="flex-container">
+        <div id="map"></div>
+        <div id ="sidescroll">
+            <p>Stations:</p>
+            <ul id="stationList">
+            </ul>
+        </div>
+    </div>
 
-	<div class="container">
+
+	<div class="chart-container">
 		<div id="chartL"></div>
 		<div id="chartR"></div>
 	</div>
