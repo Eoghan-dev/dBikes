@@ -49,13 +49,16 @@ function initMap(){
 			marker.addListener("click", () => {
 				//Close info window in this line to fix bug a
 				var infowindow = new google.maps.InfoWindow({
-					content: station.name +	"<div id='w"+station.number+"' class='weather'></div>",
+					content: station.name +
+						"<div id='pred"+station.number+"' class='prediction'></div>" +
+						"<div id='w"+station.number+"' class='weather'></div>",
 				});
 				infowindow.open(map, marker);
 				console.log("calling drawOccupancyWeekly " + station.number);
 				drawOccupancyDaily(station.number);
 				drawOccupancyWeekly(station.number);
 				get_weather(station.number);
+				get_prediction(station.number);
 			});
 		});
 
@@ -175,6 +178,23 @@ function get_weather(station_number) {
 					show_weather(station_number, weather, 'Current weather');
 				}
 			});
+		}
+}
+
+function get_prediction(station_number) {
+		var time = document.getElementById('time').value;
+		var day = document.getElementById('day').value;
+		if (time != null && day != null && buttonPressed) {
+			// get prediction
+			fetch("/predict/"+station_number+"/"+day+"/"+time).then(response => {
+				return response.json()
+			}).then(data => {
+					if(data['error'] != null) {
+						document.getElementById('pred' + station_number).innerHTML = data['error'];
+					} else {
+						document.getElementById('pred' + station_number).innerHTML = '<strong>Predicted bikes: ' + data['predicted_bikes'] + '</strong>';
+					}
+			})
 		}
 }
 
