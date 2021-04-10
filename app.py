@@ -69,12 +69,16 @@ def current_weather():
 @app.route("/weather/<int:req_day>/<int:req_time>")
 def weather_forecast(req_day, req_time):
 	engine = create_engine(f"mysql+mysqlconnector://{myPrivates.user}:{myPrivates.dbPass}@{myPrivates.dbURL}:{myPrivates.port}/{myPrivates.dbName}")
-	# get today as weekday
+	# get current weekday
 	today = datetime.datetime.today().weekday()
 	# get current hour
 	hour = datetime.datetime.today().hour
 	# calculate the correct date for the requested weekday
-	date = datetime.datetime.today() + datetime.timedelta(req_day - today)
+	if req_day < today:
+		days = 7 - today + req_day
+	else:
+		days = req_day - today
+	date = datetime.datetime.today() + datetime.timedelta(days)
 	# check if the date is in the past
 	if today == req_day and req_time <= hour:
 		return {}
@@ -113,6 +117,40 @@ def predict(station_number, temp=281.11, humidity=60, wind_speed=0, weather_id=8
 
     # return the prediction
     return int(round(y[0]))
+
+@app.route("/predict/<int:station_number>/<int:req_day>/<int:req_time>")
+def get_prediction(station_number, req_day, req_time):
+	try:
+		# get current weekday
+		today = datetime.datetime.today().weekday()
+		# get current hour
+		hour = datetime.datetime.today().hour
+		# no prediction for the past hours
+		if today == req_day and req_time <= hour:
+			return {'error': ''}
+
+		# get weather forecast or current weather
+		weather_data = weather_forecast(req_day, req_time)
+		if len(weather_data) == 0:
+			weather_data = current_weather()
+
+		weather_data = json.loads(weather_data)[0]
+		# get prediction
+		prediction = predict(
+			station_number=station_number,
+			hour=req_time,
+			week_day=req_day,
+			temp=int(weather_data['temp']),
+			humidity=int(weather_data['humidity']),
+			wind_speed=int(weather_data['wind_speed']),
+			weather_id=int(weather_data['weather_id'])
+		)
+
+		return {'predicted_bikes': prediction}
+	except Exception as error:
+		print(error)
+		# return error message
+		return {'error': 'No forecast or current weather available.'}
 
 if __name__ == "__main__":
 	app.run(debug=True)
