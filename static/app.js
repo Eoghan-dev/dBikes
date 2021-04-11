@@ -49,12 +49,16 @@ function initMap(){
 			marker.addListener("click", () => {
 				//Close info window in this line to fix bug a
 				var infowindow = new google.maps.InfoWindow({
-					content: station.name + get_weather(),
+					content: station.name +
+						"<div id='pred"+station.number+"' class='prediction'></div>" +
+						"<div id='w"+station.number+"' class='weather'></div>",
 				});
 				infowindow.open(map, marker);
 				console.log("calling drawOccupancyWeekly " + station.number);
 				drawOccupancyDaily(station.number);
 				drawOccupancyWeekly(station.number);
+				get_weather(station.number);
+				get_prediction(station.number);
 			});
 		});
 
@@ -139,19 +143,62 @@ function stationDensity(station_number){
 }
 
 var weather = {}
-fetch("/weather").then(response => {
-	return response.json()
-}).then(data => {
-	weather = data[0]
-})
+function current_weather() {
+	fetch("/weather").then(response => {
+		return response.json();
+	}).then(data => {
+		weather = data[0];
+	})
+}
 
-function get_weather() {
-	return "<div class='weather'><img src='/static/images/"+weather['weather_icon']+".png'>" +
-		"<p><strong>Current weather: " + weather['weather_description'] + "</strong></p>" +
-		"<p>Temperature " + parseInt(weather['temp'] - 273.15) + "&#8451;</p>" +
-		"<p>Feels like " + parseInt(weather['feels_like'] - 273.15) + "&#8451;</p>" +
-		"<p>Humidity " + weather['humidity'] + "%</p>" +
-		"<p>Clouds " + weather['clouds'] + "%</p>" +
-		"<p>Wind speed " + weather['wind_speed'] + " m/s</p>" +
-		"</div>"
+current_weather();
+
+function show_weather(station_number, w_data, weather_type) {
+	document.getElementById('w'+station_number).innerHTML = "<img src='/static/images/"+w_data['weather_icon']+".png'>" +
+		"<p><strong>"+weather_type+":</strong> " + w_data['weather_description'] + "</p>" +
+		"<p>Temperature " + parseInt(w_data['temp'] - 273.15) + "&#8451;</p>" +
+		"<p>Feels like " + parseInt(w_data['feels_like'] - 273.15) + "&#8451;</p>" +
+		"<p>Humidity " + w_data['humidity'] + "%</p>" +
+		"<p>Clouds " + w_data['clouds'] + "%</p>" +
+		"<p>Wind speed " + w_data['wind_speed'] + " m/s</p>";
+}
+
+function get_weather(station_number) {
+		var time = document.getElementById('time').value;
+		var day = document.getElementById('day').value;
+		if (time != null && day != null) {
+			// get weather forecast
+			fetch("/weather/"+day+"/"+time).then(response => {
+				return response.json()
+			}).then(weather_data => {
+				weather_data = weather_data[0];
+				if(weather_data && Object.keys(weather_data).length !== 0 && buttonPressed) {
+					show_weather(station_number, weather_data, 'Weather forecast');
+				} else {
+					show_weather(station_number, weather, 'Current weather');
+				}
+			});
+		}
+}
+
+function get_prediction(station_number) {
+		var time = document.getElementById('time').value;
+		var day = document.getElementById('day').value;
+		if (time != null && day != null && buttonPressed) {
+			// get prediction
+			fetch("/predict/"+station_number+"/"+day+"/"+time).then(response => {
+				return response.json()
+			}).then(data => {
+					if(data['error'] != null) {
+						document.getElementById('pred' + station_number).innerHTML = data['error'];
+					} else {
+						document.getElementById('pred' + station_number).innerHTML = '<strong>Predicted bikes: ' + data['predicted_bikes'] + '</strong>';
+					}
+			})
+		}
+}
+
+var buttonPressed = false;
+function updateState() {
+	buttonPressed = true;
 }
