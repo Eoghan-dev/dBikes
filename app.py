@@ -18,11 +18,10 @@ def about():
 @lru_cache
 def stations():
 	engine = create_engine(f"mysql+mysqlconnector://{myPrivates.user}:{myPrivates.dbPass}@{myPrivates.dbURL}:{myPrivates.port}/{myPrivates.dbName}")
-	df = pd.read_sql_table("stations", engine)
+	df = pd.read_sql_table("availRecent", engine)
 	return df.to_json(orient='records')
 
 @app.route("/occupancyD/<int:station_id>")
-@lru_cache
 def get_occupancyDay(station_id):
 	engine = create_engine(f"mysql+mysqlconnector://{myPrivates.user}:{myPrivates.dbPass}@{myPrivates.dbURL}:{myPrivates.port}/{myPrivates.dbName}")
 	#experiment with query in jupyter notebook
@@ -36,7 +35,6 @@ def get_occupancyDay(station_id):
 	return df_result.to_json(orient='records')
 
 @app.route("/occupancyW/<int:station_id>")
-@lru_cache
 def get_occupancyWeek(station_id):
 	engine = create_engine(f"mysql+mysqlconnector://{myPrivates.user}:{myPrivates.dbPass}@{myPrivates.dbURL}:{myPrivates.port}/{myPrivates.dbName}")
 	#experiment with query in jupyter notebook
