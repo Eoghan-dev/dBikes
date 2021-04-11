@@ -20,8 +20,7 @@ function initMap(){
         var stationStr = "";
 
 		data.forEach(station => {
-		    stationStr = stationStr + "<li><a href='#' onclick=someFucntion("station.number")>" + formatStationName(str=station.name) + "</a></li>"
-
+		    stationStr = stationStr + "<li><a href='javascript:showInfowindow(" + station.number + ")'>" + formatStationName(str=station.name) + "</a></li>";
             // get circle colour
             if (station.available_bikes/station.bike_stands < 0.25){
                 colour = 'red';
@@ -49,8 +48,8 @@ function initMap(){
 				map: map,
 			});
 
-            infoStr = "<div><h4>" + formatStationName(station.name) + "</h4><p>Available Bikes: "
-                + station.available_bikes + "<br>Available Bike Stands: " + station.available_bike_stands + "</p></div>"
+            var infoStr = "<div><h4>" + formatStationName(station.name) + "</h4><p>Available Bikes: "
+                + station.available_bikes + "<br>Available Bike Stands: " + station.available_bike_stands + "</p></div>";
 
 			//add listeners to markers
 			marker.addListener("click", () => {
@@ -147,6 +146,28 @@ function formatStationName(str){
         words[i] = words[i][0].toUpperCase() + words[i].substr(1);
     }
     return words.join(" ");
+}
+
+function showInfowindow(station_number) {
+	fetch( "/sideBar/" + station_number).then(response => {
+	    //console.log("get_occupancy response:",response);
+		return response.json()
+	}).then( data => {
+		//console.log("occupancy data:",data);
+		data.forEach(v => {
+		    console.log(v.name);
+            var infoStr = "<div><h4>" + formatStationName(v.name) + "</h4><p>Available Bikes: "
+                    + v.available_bikes + "<br>Available Bike Stands: " + v.available_bike_stands + "</p></div>";
+			if (infowindow) {
+				    infowindow.close();
+				}
+            infowindow = new google.maps.InfoWindow({
+                content: infoStr + get_weather(),
+                position: {lat: v.pos_lat, lng: v.pos_long}
+            });
+            infowindow.open(map);
+		})
+	})
 }
 
 var weather = {}
