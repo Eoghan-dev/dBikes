@@ -1,19 +1,40 @@
-/* Always set the map height explicitly to define the size of the div
-       * element that contains the map. */
-#map {
-  height: 60%;
-}
-
 #header {
   height: 10%;
 }
 
-.container {
+.flex-container {
+    display: flex;
+    height: 60%;
+}
+
+#map {
+    width: 70%;
+}
+
+#sidescroll {
+    width: 30%;
+    overflow: none;
+}
+
+#sidescroll > ul {
+    overflow-x: hidden;
+    overflow-y: scroll;
+    list-style-type: none;
+    text-align-last: left;
+    height: 80%;
+}
+
+#sidescroll > p {
+    margin: auto;
+    width: 50%;
+}
+
+.chart-container {
     display: flex;
     height: 30%;
 }
 
-.container > div {
+.chart-container > div {
     width: 50%;
 }
 

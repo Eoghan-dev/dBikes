@@ -1,4 +1,5 @@
-let map;
+var map;
+var infowindow = null;
 
 function initCharts(){
 	google.charts.load('current',{'packages':['corechart']});
@@ -9,25 +10,27 @@ function initMap(){
 	fetch("/stations").then(response => {
 		return response.json()
 	}).then(data => {
-		console.log("data: ", data);
+		//console.log("data: ", data);
 
 		map = new google.maps.Map(document.getElementById("map"),{
 				center: {lat: 53.34632331338235, lng: -6.26150959615664},
 				zoom: 13,
-				//read documentation and find features
 		});
 
+        var stationStr = "";
+
 		data.forEach(station => {
-		    // get circle colour
-		    if (station.available_bikes/station.available_bike_stands < 0.25){
-		        colour = 'red';
-		    } else if (station.available_bikes/station.available_bike_stands > 0.75){
-		        colour = 'green';
-		    } else {
-		        colour = 'orange';
-		    }
-		    //circles for density
-		    const circle = new google.maps.Circle({
+		    stationStr = stationStr + "<li><a href='javascript:showInfowindow(" + station.number + ")'>" + formatStationName(str=station.name) + "</a></li>";
+            // get circle colour
+            if (station.available_bikes/station.bike_stands < 0.25){
+                colour = 'red';
+            } else if (station.available_bikes/station.bike_stands > 0.75){
+                colour = 'green';
+            } else {
+                colour = 'orange';
+            }
+            //circles for density
+            const circle = new google.maps.Circle({
                 strokeColor: colour,
                 strokeOpacity: '0.9',
                 strokeWeight: 0,
@@ -37,7 +40,7 @@ function initMap(){
                 radius: 50,
                 clickable:false,
                 center: {lat: station.pos_lat, lng: station.pos_long},
-		    });
+            });
 
 		    //make markers
 			const marker = new google.maps.Marker({
@@ -45,22 +48,29 @@ function initMap(){
 				map: map,
 			});
 
+            var infoStr = "<div><h4>" + formatStationName(station.name) + "</h4><p>Available Bikes: "
+                + station.available_bikes + "<br>Available Bike Stands: " + station.available_bike_stands + "</p></div>";
+
 			//add listeners to markers
 			marker.addListener("click", () => {
 				//Close info window in this line to fix bug a
-				var infowindow = new google.maps.InfoWindow({
-					content: station.name +
+				if (infowindow) {
+				    infowindow.close();
+				}
+				infowindow = new google.maps.InfoWindow({
+					content: infoStr +
 						"<div id='pred"+station.number+"' class='prediction'></div>" +
-						"<div id='w"+station.number+"' class='weather'></div>",
+						"<div id='w"+station.number+"' class='weather'></div>"
 				});
 				infowindow.open(map, marker);
-				console.log("calling drawOccupancyWeekly " + station.number);
+				//console.log("calling drawOccupancyWeekly " + station.number);
 				drawOccupancyDaily(station.number);
 				drawOccupancyWeekly(station.number);
 				get_weather(station.number);
 				get_prediction(station.number);
 			});
 		});
+        document.getElementById("stationList").innerHTML = stationStr;
 
 		const bikeLayer = new google.maps.BicyclingLayer();
   		bikeLayer.setMap(map);
@@ -79,10 +89,11 @@ function drawOccupancyDaily(station_number) {
 	    //console.log("get_occupancy response:",response);
 		return response.json()
 	}).then( data => {
-		console.log("occupancy data:",data);
+		//console.log("occupancy data:",data);
 
 		var options = {
             title: "Average Bike Availability per day",
+            legend: "none",
             hAxis: {
                 title: "Date"
             },
@@ -111,10 +122,11 @@ function drawOccupancyWeekly(station_number) {
 	    //console.log("get_occupancy response:",response);
 		return response.json()
 	}).then( data => {
-		console.log("occupancy data:",data);
+		//console.log("occupancy data:",data);
 
 		var options = {
 			title: "Average Bike Availability per week",
+			legend: "none",
             vAxis: {
                 title: "Avg Number of Bikes"
             }
@@ -132,14 +144,31 @@ function drawOccupancyWeekly(station_number) {
 	})
 }
 
+function formatStationName(str){
+    var words = str.toLowerCase().split(",");
+    for (let i = 0; i < words.length; i++) {
+        words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+    }
+    return words.join(" ");
+}
 
-function stationDensity(station_number){
-    // This function should colour the circles under markers to represent
-    // how many bikes are available (red - none, green - loads)
-
-    // currently density is done with stations table which was scraped once (way back when)
-    // think about implementing availability using this function
-    // or updating stations before submission and exclude this function
+function showInfowindow(station_number) {
+	fetch( "/sideBar/" + station_number).then(response => {
+	    //console.log("get_occupancy response:",response);
+		return response.json()
+	}).then( data => {
+		var v = data[0];
+        var infoStr = "<div><h4>" + formatStationName(v.name) + "</h4><p>Available Bikes: "
+                + v.available_bikes + "<br>Available Bike Stands: " + v.available_bike_stands + "</p></div>";
+        if (infowindow) {
+                infowindow.close();
+            }
+        infowindow = new google.maps.InfoWindow({
+            content: infoStr + get_weather(),
+            position:  new google.maps.LatLng({lat:  v.pos_lat, lng: v.pos_long})
+        });
+		infowindow.open(map);
+	})
 }
 
 var weather = {}
