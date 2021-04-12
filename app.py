@@ -51,7 +51,7 @@ def get_occupancyWeek(station_id):
 @app.route("/sideBar/<int:station_id>")
 def get_sideBarinfo(station_id):
 	engine = create_engine(f"mysql+mysqlconnector://{myPrivates.user}:{myPrivates.dbPass}@{myPrivates.dbURL}:{myPrivates.port}/{myPrivates.dbName}")
-	query = f"""SELECT pos_lat, pos_long, available_bikes, available_bike_stands, bike_stands 
+	query = f"""SELECT name, pos_lat, pos_long, available_bikes, available_bike_stands, bike_stands 
 	FROM dbikes.stations WHERE number = {station_id}"""
 
 	df = pd.read_sql_query(query, engine)

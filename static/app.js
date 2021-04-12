@@ -1,4 +1,4 @@
-let map;
+var map;
 var infowindow = null;
 
 function initCharts(){
@@ -153,20 +153,17 @@ function showInfowindow(station_number) {
 	    //console.log("get_occupancy response:",response);
 		return response.json()
 	}).then( data => {
-		//console.log("occupancy data:",data);
-		data.forEach(v => {
-		    console.log(v.name);
-            var infoStr = "<div><h4>" + formatStationName(v.name) + "</h4><p>Available Bikes: "
-                    + v.available_bikes + "<br>Available Bike Stands: " + v.available_bike_stands + "</p></div>";
-			if (infowindow) {
-				    infowindow.close();
-				}
-            infowindow = new google.maps.InfoWindow({
-                content: infoStr + get_weather(),
-                position: {lat: v.pos_lat, lng: v.pos_long}
-            });
-            infowindow.open(map);
-		})
+		var v = data[0];
+        var infoStr = "<div><h4>" + formatStationName(v.name) + "</h4><p>Available Bikes: "
+                + v.available_bikes + "<br>Available Bike Stands: " + v.available_bike_stands + "</p></div>";
+        if (infowindow) {
+                infowindow.close();
+            }
+        infowindow = new google.maps.InfoWindow({
+            content: infoStr + get_weather(),
+            position:  new google.maps.LatLng({lat:  v.pos_lat, lng: v.pos_long})
+        });
+		infowindow.open(map);
 	})
 }
 
