@@ -164,10 +164,17 @@ function showInfowindow(station_number) {
                 infowindow.close();
             }
         infowindow = new google.maps.InfoWindow({
-            content: infoStr + get_weather(),
+            content: infoStr +
+						"<div id='pred"+station_number+"' class='prediction'></div>" +
+						"<div id='w"+station_number+"' class='weather'></div>",
             position:  new google.maps.LatLng({lat:  v.pos_lat, lng: v.pos_long})
         });
 		infowindow.open(map);
+
+		drawOccupancyDaily(station_number);
+		drawOccupancyWeekly(station_number);
+		get_weather(station_number);
+		get_prediction(station_number);
 	})
 }
 
