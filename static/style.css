@@ -1,5 +1,7 @@
 #header {
   height: 10%;
+  margin: auto;
+  width: 50%;
 }
 
 .flex-container {
@@ -22,11 +24,28 @@
     list-style-type: none;
     text-align-last: left;
     height: 80%;
+    border-left: 5px solid red;
+    background-color: #f1f1f1;
+    padding: 10px 20px;
+}
+
+#sidescroll > ul li {
+  padding: 8px 8px;
+  border-bottom: 1px solid #ddd;
+}
+#sidescroll > ul li a{
+  text-decoration: none;
+  color: black;
+}
+
+#sidescroll > ul li:last-child {
+  border-bottom: none
 }
 
 #sidescroll > p {
-    margin: auto;
-    width: 50%;
+    margin-left: 15px;
+    background-color: #f1f1f1;
+    font-weight: bold;
 }
 
 .chart-container {
@@ -44,6 +63,7 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
+  background-color: #f1f1f1;
 }
 
 .weather p {

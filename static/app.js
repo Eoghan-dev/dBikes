@@ -53,6 +53,7 @@ function initMap(){
 
 			//add listeners to markers
 			marker.addListener("click", () => {
+			    map.setCenter(marker.getPosition());
 				//Close info window in this line to fix bug a
 				if (infowindow) {
 				    infowindow.close();
@@ -94,6 +95,10 @@ function drawOccupancyDaily(station_number) {
 		var options = {
             title: "Average Bike Availability per day",
             legend: "none",
+            backgroundColor: {
+                fill: '#f1f1f1',
+                opacity: 80
+            },
             hAxis: {
                 title: "Date"
             },
@@ -127,6 +132,10 @@ function drawOccupancyWeekly(station_number) {
 		var options = {
 			title: "Average Bike Availability per week",
 			legend: "none",
+			backgroundColor: {
+                fill: '#f1f1f1',
+                opacity: 80
+            },
             vAxis: {
                 title: "Avg Number of Bikes"
             }
@@ -184,7 +193,7 @@ current_weather();
 
 function show_weather(station_number, w_data, weather_type) {
 	document.getElementById('w'+station_number).innerHTML = "<img src='/static/images/"+w_data['weather_icon']+".png'>" +
-		"<p><strong>"+weather_type+":</strong> " + w_data['weather_description'] + "</p>" +
+		"<p><b>"+weather_type+":</b> " + w_data['weather_description'] + "</p>" +
 		"<p>Temperature " + parseInt(w_data['temp'] - 273.15) + "&#8451;</p>" +
 		"<p>Feels like " + parseInt(w_data['feels_like'] - 273.15) + "&#8451;</p>" +
 		"<p>Humidity " + w_data['humidity'] + "%</p>" +
@@ -221,7 +230,7 @@ function get_prediction(station_number) {
 					if(data['error'] != null) {
 						document.getElementById('pred' + station_number).innerHTML = data['error'];
 					} else {
-						document.getElementById('pred' + station_number).innerHTML = '<strong>Predicted bikes: ' + data['predicted_bikes'] + '</strong>';
+						document.getElementById('pred' + station_number).innerHTML = '<b>Predicted bikes: ' + data['predicted_bikes'] + '</b>';
 					}
 			})
 		}
