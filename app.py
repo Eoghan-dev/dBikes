@@ -161,4 +161,4 @@ def get_prediction(station_number, req_day, req_time):
 		return {'error': 'No forecast or current weather available.'}
 
 if __name__ == "__main__":
-	app.run(debug=True)
+	app.run(host="0.0.0.0", debug=True)
