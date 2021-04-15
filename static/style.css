@@ -56,6 +56,19 @@
 .chart-container > div {
     width: 50%;
 }
+/* add styling for legend */
+#legend {
+    font-family: Arial, sans-serif;
+    background: #fff;
+    padding: 5px;
+    margin: 5px;
+    border: 2px solid #000;
+}
+
+#legend > h3 {
+    margin: auto;
+    width: 50%;
+}
 
 /* Optional: Makes the sample page fill the window. */
 html,

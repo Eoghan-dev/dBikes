@@ -1,4 +1,5 @@
 var map;
+var iconBase;
 var infowindow = null;
 
 function initCharts(){
@@ -21,31 +22,25 @@ function initMap(){
 
 		data.forEach(station => {
 		    stationStr = stationStr + "<li><a href='javascript:showInfowindow(" + station.number + ")'>" + formatStationName(str=station.name) + "</a></li>";
-            // get circle colour
+            // get marker colour url
             if (station.available_bikes/station.bike_stands < 0.25){
-                colour = 'red';
-            } else if (station.available_bikes/station.bike_stands > 0.75){
-                colour = 'green';
+                colourUrl = 'red-square.png';
+            } else if (station.available_bikes/station.bike_stands > 0.70){
+                colourUrl = 'grn-circle.png';
             } else {
-                colour = 'orange';
+                colourUrl = 'ylw-diamond.png';
             }
-            //circles for density
-            const circle = new google.maps.Circle({
-                strokeColor: colour,
-                strokeOpacity: '0.9',
-                strokeWeight: 0,
-                fillColor: colour,
-                fillOpacity: 0.55,
-                map: map,
-                radius: 50,
-                clickable:false,
-                center: {lat: station.pos_lat, lng: station.pos_long},
-            });
+
+            iconBase = 'https://maps.google.com/mapfiles/kml/paddle/';
 
 		    //make markers
 			const marker = new google.maps.Marker({
 				position: {lat: station.pos_lat, lng: station.pos_long},
 				map: map,
+				icon: {
+				    url: iconBase + colourUrl,
+				    scaledSize: new google.maps.Size(50,50)
+				}
 			});
 
             var infoStr = "<div><h4>" + formatStationName(station.name) + "</h4><p>Available Bikes: "
@@ -76,10 +71,39 @@ function initMap(){
 		const bikeLayer = new google.maps.BicyclingLayer();
   		bikeLayer.setMap(map);
 
+  		setlegend();
 
+  		map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(document.getElementById('legend'));
 	}).catch(err => {
 		console.log("OOPS!", err);
 	})
+}
+
+function setlegend(){
+    const icons = {
+        red: {
+            name: "Station occupancy < 25%",
+            icon: iconBase + "red-square.png",
+        },
+        green: {
+            name: "Station occupancy > 70%",
+            icon: iconBase + "grn-circle.png",
+        },
+        yellow: {
+            name: "25% < Station occupancy < 70%",
+            icon: iconBase + "ylw-diamond.png",
+        },
+    };
+    var legend = document.getElementById('legend');
+
+    for (var key in icons){
+        var type = icons[key];
+        var icon = type.icon;
+        var name = type.name;
+        var div = document.createElement('div');
+        div.innerHTML = '<img src="' + icon + '" width="30" height="30"> ' + name;
+        legend.appendChild(div);
+    }
 }
 
 function drawOccupancyDaily(station_number) {
