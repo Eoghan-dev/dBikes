@@ -12,3 +12,5 @@ The combination of the web framework known as Flask and Amazon Web Services (AWS
 Importing Flask into a python file provides the web framework used to navigate the various methods implemented with the variety of languages required to develop a successful web application. The App.py file speaks to the MySQL database when information is needed and provides said information to the JavaScript file for implementation and presenting to the html file for formatting. While Google developer provides the tools for displaying the map and associated features.
 
 The application is deployed on Amazons EC2 service, which is a virtual machine running on the cloud. This virtual machine runs the app.py file which with the combination of flask, gunicorn and nginx deploys the application for public use.
+
+![lastVersion_nourl](https://user-images.githubusercontent.com/71661543/157260966-728c7884-62e7-4adf-b3c5-37ab78e03b5a.png)
