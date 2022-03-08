@@ -13,4 +13,3 @@ Importing Flask into a python file provides the web framework used to navigate t
 
 The application is deployed on Amazons EC2 service, which is a virtual machine running on the cloud. This virtual machine runs the app.py file which with the combination of flask, gunicorn and nginx deploys the application for public use.
 
-![lastVersion_nourl](https://user-images.githubusercontent.com/71661543/157260966-728c7884-62e7-4adf-b3c5-37ab78e03b5a.png)
